@@ -92,6 +92,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public ComponentReferenceProperties<SnowflakeConnectionProperties> referencedComponent = new ComponentReferenceProperties<>("referencedComponent", TSnowflakeConnectionDefinition.COMPONENT_NAME);
 
+    public Property<Boolean> useAlternativeSchema = newBoolean("useAlternativeSchema", false);
+
+    private boolean withAlternativeSchema;
+
     public SnowflakeConnectionProperties(String name) {
         super(name);
     }
@@ -124,6 +128,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(region);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(warehouse);
+        if(withAlternativeSchema) {
+            mainForm.addRow(useAlternativeSchema);
+            mainForm.getWidget(useAlternativeSchema.getName()).setHidden(true);
+        }
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
 
@@ -153,6 +161,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         refreshLayout(getForm(FORM_WIZARD));
     }
 
+    public void afterUseAlternativeSchema() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -164,7 +176,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         form.getWidget(account.getName()).setHidden(hidden);
         form.getWidget(region.getName()).setHidden(hidden);
         form.getWidget(warehouse.getName()).setHidden(hidden);
-        form.getWidget(schemaName.getName()).setHidden(hidden);
+        if(withAlternativeSchema && form.getName().equals(Form.MAIN)) {
+            form.getWidget(useAlternativeSchema.getName()).setHidden(!hidden);
+        }
+        form.getWidget(schemaName.getName()).setHidden(hidden && !(withAlternativeSchema && useAlternativeSchema.getValue()));
         form.getWidget(db.getName()).setHidden(hidden);
     }
 
@@ -177,9 +192,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
             if (useOtherConnection) {
                 setHiddenProps(form, true);
             } else {
-                setHiddenProps(form, false);
                 // Do nothing
                 form.setHidden(false);
+                //Previous line will make all the fields visible
+                setHiddenProps(form, false);
 
                 form.getWidget(region.getName()).setHidden(useCustomRegion.getValue());
             }
@@ -214,7 +230,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
         if (referencedComponent.referenceType.getValue() == null ||
-                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
+                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT || useAlternativeSchema.getValue()) {
             return this;
         }
         return referencedComponent.getReference();
@@ -267,12 +283,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
                 : this.region.getValue().getRegionID();
         String warehouse = this.warehouse.getStringValue();
         String db = this.db.getStringValue();
-        String schema = this.schemaName.getStringValue();
         String role = this.role.getStringValue();
 
         appendProperty("warehouse", warehouse, connectionParams);
         appendProperty("db", db, connectionParams);
-        appendProperty("schema", schema, connectionParams);
         appendProperty("role", role, connectionParams);
         appendProperty("application", getApplication(), connectionParams);
 
@@ -365,6 +379,14 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     @Override
     public int getVersionNumber() {
         return 1;
+    }
+
+    public void setWithAlternativeSchema(boolean withAlternativeSchema) {
+        this.withAlternativeSchema = withAlternativeSchema;
+    }
+
+    public boolean isWithAlternativeSchema() {
+        return this.withAlternativeSchema;
     }
 
 }

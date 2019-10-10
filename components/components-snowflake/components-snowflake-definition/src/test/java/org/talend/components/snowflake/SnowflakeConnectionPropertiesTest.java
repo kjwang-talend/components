@@ -97,7 +97,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
+                .append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
@@ -120,7 +120,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append(AZURE_REGION.getRegionID()).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
+                .append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
@@ -143,7 +143,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
+                .append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .append("&").append("no_proxy=").append(NO_PROXY).toString();
 
@@ -166,7 +166,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
+                .append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
@@ -185,7 +185,7 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptyWarehouse() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("db=").append(DB).append("&").append("schema=").append(SCHEMA).append("&").append("role=")
+                .append("?").append("db=").append(DB).append("&").append("role=")
                 .append(ROLE).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.warehouse.setValue(null);
@@ -209,7 +209,7 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptyDb() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("schema=").append(SCHEMA).append("&")
+                .append("?").append("warehouse=").append(WAREHOUSE).append("&")
                 .append("role=").append(ROLE).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.db.setValue(null);
@@ -258,7 +258,7 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
+                .append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.role.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();
@@ -340,6 +340,40 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetReferencedConnectionProperties() {
         snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));
         Assert.assertNotNull(snowflakeConnectionProperties.getReferencedConnectionProperties());
+    }
+
+    @Test
+    public void testAlternativeSchema() {
+        snowflakeConnectionProperties.setWithAlternativeSchema(true);
+        snowflakeConnectionProperties.userPassword.setupLayout();
+        snowflakeConnectionProperties.setupLayout();
+
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
+        snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));
+        snowflakeConnectionProperties.referencedComponent.componentInstanceId.setValue("reference");
+        snowflakeConnectionProperties.afterReferencedComponent();
+
+        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.schemaName.getName()).isHidden());
+
+        snowflakeConnectionProperties.useAlternativeSchema.setValue(true);
+        snowflakeConnectionProperties.afterUseAlternativeSchema();
+
+        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.schemaName.getName()).isHidden());
+    }
+
+    @Test
+    public void testHiddenAlternateSchema() {
+        snowflakeConnectionProperties.setWithAlternativeSchema(true);
+        snowflakeConnectionProperties.userPassword.setupLayout();
+        snowflakeConnectionProperties.setupLayout();
+        snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));
+        snowflakeConnectionProperties.referencedComponent.componentInstanceId.setValue("reference");
+        snowflakeConnectionProperties.afterReferencedComponent();
+        snowflakeConnectionProperties.referencedComponent.componentInstanceId.setValue(null);
+        snowflakeConnectionProperties.afterReferencedComponent();
+
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
     }
 
     @Test

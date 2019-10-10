@@ -157,6 +157,26 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return connProps;
     }
 
+    private String getEffectiveSchemaName(RuntimeContainer container) {
+        SnowflakeConnectionProperties connProps = properties.getConnectionProperties();
+        String refComponentId = connProps.getReferencedComponentId();
+        // Using another component's connection
+        if (refComponentId != null) {
+            if(connProps.useAlternativeSchema.getValue()) {
+                return connProps.schemaName.getValue();
+            }
+            // In a runtime container
+            if (container != null) {
+                SnowflakeConnectionProperties effectiveProps = (SnowflakeConnectionProperties) container.getComponentData(refComponentId,
+                        SnowflakeRuntime.KEY_CONNECTION_PROPERTIES);
+                return effectiveProps != null ? effectiveProps.schemaName.getValue() : null;
+            }
+            // Design time
+            return connProps.getReferencedConnectionProperties().schemaName.getValue();
+        }
+        return connProps.schemaName.getValue();
+    }
+
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         return getSchemaNames(container, createConnection(container));
@@ -180,14 +200,14 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
 
             // Fetch all tables in the db and schema provided
             String[] types = { "TABLE", "VIEW" };
-            ResultSet resultIter = metaData.getTables(getCatalog(connProps), getDbSchema(connProps), null, types);
+            ResultSet resultIter = metaData.getTables(getCatalog(connProps), getEffectiveSchemaName(container), null, types);
             String tableName = null;
             while (resultIter.next()) {
                 tableName = resultIter.getString("TABLE_NAME");
                 returnList.add(new SimpleNamedThing(tableName, tableName));
             }
         } catch (SQLException se) {
-            throw new IOException(i18nMessages.getMessage("error.searchingTable", getCatalog(connProps), getDbSchema(connProps),
+            throw new IOException(i18nMessages.getMessage("error.searchingTable", getCatalog(connProps), getEffectiveSchemaName(container),
                     se.getMessage()), se);
         }
         return returnList;
@@ -243,7 +263,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         try {
             JDBCTableMetadata tableMetadata = new JDBCTableMetadata();
             tableMetadata.setDatabaseMetaData(connection.getMetaData()).setCatalog(getCatalog(connProps))
-                    .setDbSchema(getDbSchema(connProps)).setTablename(tableName);
+                    .setDbSchema(getEffectiveSchemaName(container)).setTablename(tableName);
             tableSchema = getSnowflakeAvroRegistry().inferSchema(tableMetadata);
             if (tableSchema == null) {
                 throw new IOException(i18nMessages.getMessage("error.tableNotFound", tableName));

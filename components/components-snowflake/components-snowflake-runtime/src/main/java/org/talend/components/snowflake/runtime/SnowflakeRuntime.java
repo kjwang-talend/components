@@ -55,6 +55,7 @@ public abstract class SnowflakeRuntime {
         Connection conn = null;
         SnowflakeConnectionProperties connectionProperties = getConnectionProperties();
         String refComponentId = connectionProperties.getReferencedComponentId();
+        String schemaName = connectionProperties.schemaName.getValue();
         // Using another component's connection
         if (refComponentId != null) {
             // In a runtime container
@@ -70,6 +71,10 @@ public abstract class SnowflakeRuntime {
                 throw new IOException(I18N_MESSAGES.getMessage("error.refComponentNotConnected", refComponentId));
             }
             // Design time
+            if(connectionProperties.isWithAlternativeSchema() && !connectionProperties.useAlternativeSchema.getValue()
+                    && connectionProperties.getReferencedConnectionProperties() != null) {
+                schemaName = connectionProperties.getReferencedConnectionProperties().schemaName.getValue();
+            }
             connectionProperties = connectionProperties.getReferencedConnectionProperties();
             // FIXME This should not happen - but does as of now
             if (connectionProperties == null) {
@@ -82,6 +87,11 @@ public abstract class SnowflakeRuntime {
         }
 
         conn = DriverManagerUtils.getConnection(connectionProperties);
+        try {
+            conn.setSchema(schemaName);
+        } catch (SQLException e) {
+            throw new IOException(I18N_MESSAGES.getMessage("error.couldNotSetSchema", schemaName));
+        }
 
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, conn);

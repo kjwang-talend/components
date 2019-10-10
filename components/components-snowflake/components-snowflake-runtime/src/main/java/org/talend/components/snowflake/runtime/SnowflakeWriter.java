@@ -203,9 +203,16 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         if (selectedTableAction != TableActionEnum.TRUNCATE) {
             SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
             try {
+                String schemaName;
                 SnowflakeConnectionProperties connectionProperties1 = connectionProperties.getReferencedConnectionProperties();
                 if (connectionProperties1 == null) {
                     connectionProperties1 = sprops.getConnectionProperties();
+                }
+
+                if(connectionProperties.getReferencedConnectionProperties() != null && connectionProperties.useAlternativeSchema.getValue()) {
+                    schemaName = connectionProperties.schemaName.getValue();
+                } else {
+                    schemaName = connectionProperties1.schemaName.getValue();
                 }
 
                 TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
@@ -214,7 +221,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
                 Map<String, String> dbTypeMap = getDbTypeMap();
                 TableActionManager.exec(processingConnection, selectedTableAction,
-                        new String[] { connectionProperties1.db.getValue(), connectionProperties1.schemaName.getValue(),
+                        new String[] { connectionProperties1.db.getValue(), schemaName,
                                 sprops.getTableName() }, schemaForCreateTable, conf, dbTypeMap);
             } catch (IOException e) {
                 throw e;
@@ -416,12 +423,19 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             TSnowflakeOutputProperties outputProperties,
             Schema mainSchema) {
         SnowflakeConnectionProperties connectionProperties = outputProperties.getConnectionProperties();
+        String schemaName = connectionProperties.schemaName.getValue();
+        if(connectionProperties.getReferencedComponentId() != null) {
+            if(!connectionProperties.useAlternativeSchema.getValue()) {
+                schemaName = connectionProperties.getReferencedConnectionProperties().schemaName.getValue();
+            }
+            connectionProperties = connectionProperties.getReferencedConnectionProperties();
+        }
 
         Map<LoaderProperty, Object> prop = new HashMap<>();
         boolean isUpperCase = outputProperties.convertColumnsAndTableToUppercase.getValue();
         String tableName = isUpperCase ? outputProperties.getTableName().toUpperCase() : outputProperties.getTableName();
         prop.put(LoaderProperty.tableName, tableName);
-        prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
+        prop.put(LoaderProperty.schemaName, schemaName);
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
         switch (outputProperties.outputAction.getValue()) {
         case INSERT:

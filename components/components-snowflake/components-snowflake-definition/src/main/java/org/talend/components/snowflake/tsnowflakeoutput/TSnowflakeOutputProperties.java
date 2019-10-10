@@ -109,6 +109,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public void setupProperties() {
         super.setupProperties();
 
+        connection.setWithAlternativeSchema(true);
+        
         tableAction.setValue(TableAction.TableActionEnum.NONE);
         outputAction.setValue(OutputAction.INSERT);
         ISchemaListener listener;

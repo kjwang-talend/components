@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -64,6 +65,35 @@ public class SnowflakeSourceOrSinkTest {
         properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
         this.snowflakeSourceOrSink.initialize(runtimeContainerMock, properties);
         PowerMockito.mockStatic(DriverManagerUtils.class);
+    }
+
+    @Test
+    public void testSetSchema() throws SQLException, IOException {
+        SnowflakeConnectionProperties refProperties = new SnowflakeConnectionProperties("referenced");
+        refProperties.account.setValue("talend");
+        refProperties.userPassword.password.setValue("teland_password");
+        refProperties.userPassword.userId.setValue("talend_dev");
+        refProperties.schemaName.setValue("LOAD");
+        refProperties.db.setValue("TestDB");
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("connection");
+        properties.setWithAlternativeSchema(true);
+        properties.useAlternativeSchema.setValue(true);
+        properties.schemaName.setValue("NEW_SCHEMA");
+
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenReturn(false);
+        Mockito.when(
+                DriverManagerUtils.getConnection(Mockito.any()))
+               .thenReturn(connection);
+
+        SnowflakeSourceOrSink sss = new SnowflakeSourceOrSink();
+        sss.initialize(null, properties);
+
+        ArgumentCaptor<String> schemaCaptor = ArgumentCaptor.forClass(String.class);
+        sss.createConnection(runtimeContainerMock);
+
+        Mockito.verify(connection).setSchema(schemaCaptor.capture());
+        Assert.assertEquals("NEW_SCHEMA", schemaCaptor.getValue());
     }
 
     @Test

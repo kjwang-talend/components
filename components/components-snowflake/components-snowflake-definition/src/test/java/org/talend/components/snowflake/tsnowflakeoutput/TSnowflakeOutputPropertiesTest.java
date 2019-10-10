@@ -234,4 +234,9 @@ public class TSnowflakeOutputPropertiesTest {
         Assert.assertEquals("id", outputProperties.dbtypeTable.column.getPossibleValues().get(0));
     }
 
+    @Test
+    public void testWithAlternativeSchema() {
+        Assert.assertTrue(outputProperties.getConnectionProperties().isWithAlternativeSchema());
+    }
+
 }
