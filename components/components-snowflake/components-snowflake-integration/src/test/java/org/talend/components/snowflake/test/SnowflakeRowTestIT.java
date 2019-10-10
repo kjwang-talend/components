@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.snowflake.test;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 
@@ -77,8 +79,7 @@ public class SnowflakeRowTestIT extends SnowflakeTestIT {
         connectionProperties.db.setStoredValue(DB);
         connectionProperties.schemaName.setStoredValue(SCHEMA);
         connectionProperties.loginTimeout.setStoredValue(1);
-        container.setComponentData(REF_ID, SnowflakeRuntime.KEY_CONNECTION,
-                DriverManagerUtils.getConnection(connectionProperties));
+        container.setComponentData(REF_ID, SnowflakeRuntime.KEY_CONNECTION, createConnection(connectionProperties));
 
         rowStandalone = new SnowflakeRowStandalone();
         standaloneProperties = new TSnowflakeRowProperties("standalone");
@@ -91,6 +92,13 @@ public class SnowflakeRowTestIT extends SnowflakeTestIT {
                 + "NAME VARCHAR(20)," + "CREATED_DATE TIMESTAMP" + ");");
         rowStandalone.runAtDriver(container);
 
+    }
+
+    private static Connection createConnection(SnowflakeConnectionProperties connectionProperties)
+            throws IOException, SQLException {
+        Connection connection = DriverManagerUtils.getConnection(connectionProperties);
+        connection.setSchema(connectionProperties.schemaName.getValue());
+        return connection;
     }
 
     @AfterClass

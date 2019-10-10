@@ -398,6 +398,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
         try (Connection connection = DriverManagerUtils.getConnection(outputProps.connection)) {
             try {
+                connection.setSchema(outputProps.connection.schemaName.getValue());
                 // test case
                 writeRows(writer, Collections.singletonList(record));
 
