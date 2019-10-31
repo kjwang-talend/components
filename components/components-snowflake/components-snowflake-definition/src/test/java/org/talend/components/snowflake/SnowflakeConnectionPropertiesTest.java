@@ -348,18 +348,18 @@ public class SnowflakeConnectionPropertiesTest {
         snowflakeConnectionProperties.userPassword.setupLayout();
         snowflakeConnectionProperties.setupLayout();
 
-        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
         snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));
         snowflakeConnectionProperties.referencedComponent.componentInstanceId.setValue("reference");
         snowflakeConnectionProperties.afterReferencedComponent();
 
-        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
-        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.schemaName.getName()).isHidden());
+        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.alternativeSchemaName.getName()).isHidden());
 
         snowflakeConnectionProperties.useAlternativeSchema.setValue(true);
         snowflakeConnectionProperties.afterUseAlternativeSchema();
 
-        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.schemaName.getName()).isHidden());
+        Assert.assertFalse(snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.alternativeSchemaName.getName()).isHidden());
     }
 
     @Test
@@ -373,7 +373,7 @@ public class SnowflakeConnectionPropertiesTest {
         snowflakeConnectionProperties.referencedComponent.componentInstanceId.setValue(null);
         snowflakeConnectionProperties.afterReferencedComponent();
 
-        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.useAlternativeSchema.getName()).isHidden());
     }
 
     @Test

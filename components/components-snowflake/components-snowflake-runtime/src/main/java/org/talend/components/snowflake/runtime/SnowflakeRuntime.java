@@ -71,8 +71,9 @@ public abstract class SnowflakeRuntime {
                 throw new IOException(I18N_MESSAGES.getMessage("error.refComponentNotConnected", refComponentId));
             }
             // Design time
-            if(connectionProperties.isWithAlternativeSchema() && !connectionProperties.useAlternativeSchema.getValue()
-                    && connectionProperties.getReferencedConnectionProperties() != null) {
+            if(connectionProperties.isWithAlternativeSchema() && connectionProperties.useAlternativeSchema.getValue()) {
+                schemaName = connectionProperties.alternativeSchemaName.getValue();
+            } else if(connectionProperties.getReferencedConnectionProperties() != null) {
                 schemaName = connectionProperties.getReferencedConnectionProperties().schemaName.getValue();
             }
             connectionProperties = connectionProperties.getReferencedConnectionProperties();

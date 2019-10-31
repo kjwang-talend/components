@@ -37,6 +37,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.runtime.utils.DriverManagerUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -67,8 +68,11 @@ public class SnowflakeSourceOrSinkTest {
         PowerMockito.mockStatic(DriverManagerUtils.class);
     }
 
+    /**
+     * This test is used to check if alternate schema is being set to connection when creating a new one.
+     */
     @Test
-    public void testSetSchema() throws SQLException, IOException {
+    public void testSetAlternateSchema() throws SQLException, IOException {
         SnowflakeConnectionProperties refProperties = new SnowflakeConnectionProperties("referenced");
         refProperties.account.setValue("talend");
         refProperties.userPassword.password.setValue("teland_password");
@@ -76,9 +80,12 @@ public class SnowflakeSourceOrSinkTest {
         refProperties.schemaName.setValue("LOAD");
         refProperties.db.setValue("TestDB");
         SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("connection");
+        properties.referencedComponent.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+        properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
+        properties.referencedComponent.setReference(refProperties);
         properties.setWithAlternativeSchema(true);
         properties.useAlternativeSchema.setValue(true);
-        properties.schemaName.setValue("NEW_SCHEMA");
+        properties.alternativeSchemaName.setValue("NEW_SCHEMA");
 
         Connection connection = Mockito.mock(Connection.class);
         Mockito.when(connection.isClosed()).thenReturn(false);
@@ -90,7 +97,7 @@ public class SnowflakeSourceOrSinkTest {
         sss.initialize(null, properties);
 
         ArgumentCaptor<String> schemaCaptor = ArgumentCaptor.forClass(String.class);
-        sss.createConnection(runtimeContainerMock);
+        sss.createConnection(null);
 
         Mockito.verify(connection).setSchema(schemaCaptor.capture());
         Assert.assertEquals("NEW_SCHEMA", schemaCaptor.getValue());

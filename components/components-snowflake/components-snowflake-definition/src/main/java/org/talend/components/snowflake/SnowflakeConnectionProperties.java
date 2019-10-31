@@ -94,6 +94,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<Boolean> useAlternativeSchema = newBoolean("useAlternativeSchema", false);
 
+    public Property<String> alternativeSchemaName = newString("alternativeSchemaName").setRequired(); //$NON-NLS-1$
+
     private boolean withAlternativeSchema;
 
     public SnowflakeConnectionProperties(String name) {
@@ -128,15 +130,16 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(region);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(warehouse);
-        if(withAlternativeSchema) {
-            mainForm.addRow(useAlternativeSchema);
-            mainForm.getWidget(useAlternativeSchema.getName()).setHidden(true);
-        }
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(jdbcParameters);
+        if(withAlternativeSchema) {
+            advancedForm.addRow(useAlternativeSchema);
+            advancedForm.addRow(alternativeSchemaName);
+            setAlternateSchemaHidden(true, advancedForm);
+        }
         advancedForm.addRow(useCustomRegion);
         advancedForm.addColumn(customRegionID);
         advancedForm.addRow(loginTimeout);
@@ -148,6 +151,15 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
+    }
+
+    private void setAlternateSchemaHidden(boolean hidden, Form form) {
+        if(withAlternativeSchema) {
+            form.getWidget(useAlternativeSchema.getName())
+                .setHidden(hidden);
+            form.getWidget(alternativeSchemaName.getName())
+                .setVisible(!hidden && useAlternativeSchema.getValue());
+        }
     }
 
     public void afterAdvanced() {
@@ -162,7 +174,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     }
 
     public void afterUseAlternativeSchema() {
-        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public void afterReferencedComponent() {
@@ -176,10 +188,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         form.getWidget(account.getName()).setHidden(hidden);
         form.getWidget(region.getName()).setHidden(hidden);
         form.getWidget(warehouse.getName()).setHidden(hidden);
-        if(withAlternativeSchema && form.getName().equals(Form.MAIN)) {
-            form.getWidget(useAlternativeSchema.getName()).setHidden(!hidden);
-        }
-        form.getWidget(schemaName.getName()).setHidden(hidden && !(withAlternativeSchema && useAlternativeSchema.getValue()));
+        form.getWidget(schemaName.getName()).setHidden(hidden);
         form.getWidget(db.getName()).setHidden(hidden);
     }
 
@@ -204,8 +213,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         if (form.getName().equals(Form.ADVANCED)) {
             if (useOtherConnection) {
                 form.setHidden(true);
+                setAlternateSchemaHidden(false, form);
             } else {
                 form.setHidden(false);
+                setAlternateSchemaHidden(true, form);
 
                 getForm(Form.ADVANCED).getWidget(customRegionID).setVisible(useCustomRegion.getValue());
             }
@@ -230,7 +241,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
         if (referencedComponent.referenceType.getValue() == null ||
-                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT || useAlternativeSchema.getValue()) {
+                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
+            return this;
+        }
+        if(isWithAlternativeSchema() && useAlternativeSchema.getValue()) {
             return this;
         }
         return referencedComponent.getReference();

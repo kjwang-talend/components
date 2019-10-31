@@ -158,12 +158,17 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
     }
 
     private String getEffectiveSchemaName(RuntimeContainer container) {
-        SnowflakeConnectionProperties connProps = properties.getConnectionProperties();
+        SnowflakeConnectionProperties connProps;
+        if(properties instanceof SnowflakeConnectionProperties) {
+            connProps = (SnowflakeConnectionProperties)properties;
+        } else {
+            connProps = properties.getConnectionProperties();
+        }
         String refComponentId = connProps.getReferencedComponentId();
         // Using another component's connection
         if (refComponentId != null) {
-            if(connProps.useAlternativeSchema.getValue()) {
-                return connProps.schemaName.getValue();
+            if(connProps.isWithAlternativeSchema() && connProps.useAlternativeSchema.getValue()) {
+                return connProps.alternativeSchemaName.getValue();
             }
             // In a runtime container
             if (container != null) {
