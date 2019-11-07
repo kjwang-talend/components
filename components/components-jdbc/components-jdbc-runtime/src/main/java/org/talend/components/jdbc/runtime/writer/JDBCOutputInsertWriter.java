@@ -90,10 +90,10 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
         }
 
         try {
-            insertCount += execute(input, statement);
             if (setting.getDebug()) {
                 LOG.debug("'"+sql_fact+"'.");
             }
+            insertCount += execute(input, statement);
         } catch (SQLException e) {
             if (dieOnError) {
                 throw CommonUtils.newComponentException(e);

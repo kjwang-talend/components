@@ -90,10 +90,10 @@ public class JDBCOutputDeleteWriter extends JDBCOutputWriter {
         }
 
         try {
-            deleteCount += execute(input, statement);
             if (setting.getDebug()) {
                 LOG.debug("'"+sql_fact+"'.");
             }
+            deleteCount += execute(input, statement);
         } catch (SQLException e) {
             if (dieOnError) {
                 throw CommonUtils.newComponentException(e);

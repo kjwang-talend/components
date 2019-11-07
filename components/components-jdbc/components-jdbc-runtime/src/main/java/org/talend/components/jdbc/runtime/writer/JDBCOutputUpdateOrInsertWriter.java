@@ -130,10 +130,10 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
         }
 
         try {
-            int count = statementUpdate.executeUpdate();
             if (setting.getDebug()) {
                 LOG.debug("'"+updateSql_fact+"'.");
             }
+            int count = statementUpdate.executeUpdate();
             updateCount += count;
 
             boolean noDataUpdate = (count == 0);
@@ -144,10 +144,10 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
                     runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, insertSql_fact);
                 }
 
-                insertCount += execute(input, statementInsert);
                 if (setting.getDebug()) {
                     LOG.debug("'"+insertSql_fact+"'.");
                 }
+                insertCount += execute(input, statementInsert);
             } else {
                 result.totalCount++;
                 handleSuccess(input);

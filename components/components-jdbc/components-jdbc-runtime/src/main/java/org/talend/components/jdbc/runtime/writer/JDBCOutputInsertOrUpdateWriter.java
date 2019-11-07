@@ -172,10 +172,10 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                     throw CommonUtils.newComponentException(e);
                 }
 
-                updateCount += execute(input, statementUpdate);
                 if (setting.getDebug()) {
                     LOG.debug("'"+sql_fact+"'.");
                 }
+                updateCount += execute(input, statementUpdate);
             } else {// do insert
                 String sql_fact = null;
                 try {
@@ -187,10 +187,10 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                     throw CommonUtils.newComponentException(e);
                 }
 
-                insertCount += execute(input, statementInsert);
                 if (setting.getDebug()) {
                     LOG.debug("'"+sql_fact+"'.");
                 }
+                insertCount += execute(input, statementInsert);
             }
         } catch (SQLException e) {
             if (dieOnError) {
