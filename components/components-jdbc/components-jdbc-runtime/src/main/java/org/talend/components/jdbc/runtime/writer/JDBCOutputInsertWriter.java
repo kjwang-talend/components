@@ -79,8 +79,9 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
 
         initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
+        String sql_fact = null;
         try {
-            String sql_fact = rowWriter.write(input);
+            sql_fact = rowWriter.write(input);
             if (sql_fact != null) {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
@@ -90,6 +91,9 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
 
         try {
             insertCount += execute(input, statement);
+            if (setting.getDebug()) {
+                LOG.debug("'"+sql_fact+"'.");
+            }
         } catch (SQLException e) {
             if (dieOnError) {
                 throw CommonUtils.newComponentException(e);

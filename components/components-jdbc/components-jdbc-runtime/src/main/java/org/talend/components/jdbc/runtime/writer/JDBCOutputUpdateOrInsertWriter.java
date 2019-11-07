@@ -119,10 +119,11 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
 
         initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
+        String updateSql_fact = null;
         try {
-            String sql_fact = rowWriter4Update.write(input);
-            if (sql_fact != null) {
-                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
+            updateSql_fact = rowWriter4Update.write(input);
+            if (updateSql_fact != null) {
+                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, updateSql_fact);
             }
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
@@ -130,18 +131,23 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
 
         try {
             int count = statementUpdate.executeUpdate();
-
+            if (setting.getDebug()) {
+                LOG.debug("'"+updateSql_fact+"'.");
+            }
             updateCount += count;
 
             boolean noDataUpdate = (count == 0);
 
             if (noDataUpdate) {
-                String sql_fact = rowWriter4Insert.write(input);
-                if (sql_fact != null) {
-                    runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
+                String insertSql_fact = rowWriter4Insert.write(input);
+                if (insertSql_fact != null) {
+                    runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, insertSql_fact);
                 }
 
                 insertCount += execute(input, statementInsert);
+                if (setting.getDebug()) {
+                    LOG.debug("'"+insertSql_fact+"'.");
+                }
             } else {
                 result.totalCount++;
                 handleSuccess(input);

@@ -162,8 +162,9 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
 
         try {
             if (dataExists) {// do update
+                String sql_fact = null;
                 try {
-                    String sql_fact = rowWriter4Update.write(input);
+                    sql_fact = rowWriter4Update.write(input);
                     if (sql_fact != null) {
                         runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
                     }
@@ -172,9 +173,13 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                 }
 
                 updateCount += execute(input, statementUpdate);
+                if (setting.getDebug()) {
+                    LOG.debug("'"+sql_fact+"'.");
+                }
             } else {// do insert
+                String sql_fact = null;
                 try {
-                    String sql_fact = rowWriter4Insert.write(input);
+                    sql_fact = rowWriter4Insert.write(input);
                     if (sql_fact != null) {
                         runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
                     }
@@ -183,6 +188,9 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                 }
 
                 insertCount += execute(input, statementInsert);
+                if (setting.getDebug()) {
+                    LOG.debug("'"+sql_fact+"'.");
+                }
             }
         } catch (SQLException e) {
             if (dieOnError) {
