@@ -11,7 +11,7 @@
 
     <name>Components - Snowflake Runtime</name>
     <artifactId>components-snowflake-runtime</artifactId>
-    <version>0.25.4</version>
+    <version>0.25.5</version>
     <packaging>bundle</packaging>
 
     <properties>
