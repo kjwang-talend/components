@@ -7,7 +7,6 @@ public class DebugUtil {
     private StringBuffer strBuffer;
 
     public DebugUtil(String sql) {
-        sql += " ";
         splits = sql.split("\\?");
         strBuffer = new StringBuffer(32);
     }
@@ -34,7 +33,10 @@ public class DebugUtil {
     }
 
     public String getSQL() {
-        return strBuffer.toString();
+        String sql = strBuffer.toString();
+        index = 0;
+        strBuffer = new StringBuffer(32);
+        return sql;
     }
 
 }

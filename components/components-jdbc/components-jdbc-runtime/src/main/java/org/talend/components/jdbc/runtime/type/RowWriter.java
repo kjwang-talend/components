@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,8 @@ public class RowWriter {
 
     private DebugUtil debugUtil;
 
+    private SimpleDateFormat formatter;
+
     public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema,
             PreparedStatement statement) {
         this(columnList, inputSchema, componentSchema, statement, false, null);
@@ -34,6 +37,7 @@ public class RowWriter {
 
         if (debug) {
             debugUtil = new DebugUtil(sql);
+            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         }
 
         List<TypeWriter> writers = new ArrayList<TypeWriter>();
@@ -183,7 +187,9 @@ public class RowWriter {
             } else {
                 if (inputValue instanceof Date) {
                     statement.setTimestamp(statementIndex, new Timestamp(((Date) inputValue).getTime()));
-                    writeDebugColumnNullContent();
+                    if (debug) {
+                        debugUtil.writeColumn(formatter.format((Date) inputValue), false);
+                    }
                 } else {
                     statement.setTimestamp(statementIndex, new Timestamp((long) inputValue));
                     if (debug) {
