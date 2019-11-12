@@ -119,20 +119,18 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
 
         initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
-        String updateSql_fact = null;
         try {
-            updateSql_fact = rowWriter4Update.write(input);
+            String updateSql_fact = rowWriter4Update.write(input);
             if (updateSql_fact != null) {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, updateSql_fact);
             }
+            if (setting.getDebug())
+                LOG.debug("'"+updateSql_fact.trim()+"'.");
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
         }
 
         try {
-            if (setting.getDebug()) {
-                LOG.debug("'"+updateSql_fact+"'.");
-            }
             int count = statementUpdate.executeUpdate();
             updateCount += count;
 
@@ -144,9 +142,8 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
                     runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, insertSql_fact);
                 }
 
-                if (setting.getDebug()) {
-                    LOG.debug("'"+insertSql_fact+"'.");
-                }
+                if (setting.getDebug())
+                    LOG.debug("'"+insertSql_fact.trim()+"'.");
                 insertCount += execute(input, statementInsert);
             } else {
                 result.totalCount++;

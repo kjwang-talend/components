@@ -7,6 +7,7 @@ public class DebugUtil {
     private StringBuffer strBuffer;
 
     public DebugUtil(String sql) {
+        sql += " ";
         splits = sql.split("\\?");
         strBuffer = new StringBuffer(32);
     }

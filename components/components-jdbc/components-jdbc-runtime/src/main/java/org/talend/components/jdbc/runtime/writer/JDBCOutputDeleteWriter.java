@@ -79,20 +79,18 @@ public class JDBCOutputDeleteWriter extends JDBCOutputWriter {
 
         initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
-        String sql_fact = null;
         try {
-            sql_fact = rowWriter.write(input);
+            String sql_fact = rowWriter.write(input);
             if (sql_fact != null) {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
+            if (setting.getDebug())
+                LOG.debug("'"+sql_fact.trim()+"'.");
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
         }
 
         try {
-            if (setting.getDebug()) {
-                LOG.debug("'"+sql_fact+"'.");
-            }
             deleteCount += execute(input, statement);
         } catch (SQLException e) {
             if (dieOnError) {
