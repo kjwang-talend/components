@@ -5,26 +5,27 @@ product:
 - https://talend.poolparty.biz/coretaxonomy/23
 ---
 
-# TPS-3367 <!-- mandatory -->
+# TPS-3527 <!-- mandatory -->
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20190918\_TPS-3367\_v1-7.1.1 |
-| Release Date     | 2019-09-18 |
+| Patch Name       | Patch\_20191112\_TPS-3527\_v1-7.1.1 |
+| Release Date     | 2019-11-12 |
 | Target Version   | 20181026\_1147-V7.1.1 |
 | Product affected | Talend Studio |
 
 ## Introduction <!-- mandatory -->
 
-This is the first patch of Snowflake component 7.1.1.
+This is the second patch of Snowflake component for 7.1.1.
 
 **NOTE**: For information on how to obtain this patch, reach out to your Support contact at Talend.
 
 ## Fixed issues <!-- mandatory -->
 
-This is the first patch of 7.1.1 and contains the following fixes:
+This is the second patch of 7.1.1 and contains the following fixes:
 
 - TPS-3367 [7.1.1] tSnowflakeOutput Dynamic column does not work when additional static columns are added (TDI-42854)
+- TPS-3527 [7.1.1] Snowflake gives incorrect output in sydney/melbourne (DST) from date at DST start/end (TDI-43038)
 
 ## Prerequisites <!-- mandatory -->
 
@@ -72,5 +73,5 @@ In case this patch cannot be uninstalled, it is your responsability to define th
 
 The following files are installed by this patch:
 
-- configuration/.m2/repository/org/talend/components/components-snowflake-runtime/0.25.4/components-snowflake-runtime-0.25.4.jar
-- plugins/org.talend.components.snowflake.definition\_0.25.4.jar
+- configuration/.m2/repository/org/talend/components/components-snowflake-runtime/0.25.5/components-snowflake-runtime-0.25.5.jar
+- plugins/org.talend.components.snowflake.definition\_0.25.5.jar
