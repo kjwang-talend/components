@@ -24,8 +24,6 @@ public class RowWriter {
 
     private DebugUtil debugUtil;
 
-    private SimpleDateFormat formatter;
-
     public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema,
             PreparedStatement statement) {
         this(columnList, inputSchema, componentSchema, statement, false, null);
@@ -37,7 +35,6 @@ public class RowWriter {
 
         if (debug) {
             debugUtil = new DebugUtil(sql);
-            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         }
 
         List<TypeWriter> writers = new ArrayList<TypeWriter>();
@@ -49,6 +46,7 @@ public class RowWriter {
 
             Field componentField = CommonUtils.getField(componentSchema, column.columnLabel);
             int inputValueLocation = inputField.pos();
+            String pattern = componentField.getProp("talend.field.pattern");
             statementIndex++;
 
             Schema basicSchema = AvroUtils.unwrapIfNullable(componentField.schema());
@@ -62,7 +60,7 @@ public class RowWriter {
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int())) {
                 writer = new IntTypeWriter(statement, statementIndex, inputValueLocation);
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {
-                writer = new DateTypeWriter(statement, statementIndex, inputValueLocation);
+                writer = new DateTypeWriter(statement, statementIndex, inputValueLocation, pattern);
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal())) {
                 writer = new BigDecimalTypeWriter(statement, statementIndex, inputValueLocation);
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._long())) {
@@ -176,8 +174,10 @@ public class RowWriter {
 
     class DateTypeWriter extends TypeWriter {
 
-        DateTypeWriter(PreparedStatement statement, int statementIndex, int inputValueLocation) {
+        private String pattern;
+        DateTypeWriter(PreparedStatement statement, int statementIndex, int inputValueLocation, String pattern) {
             super(statement, statementIndex, inputValueLocation);
+            this.pattern = pattern;
         }
 
         public void write(IndexedRecord input) throws SQLException {
@@ -188,7 +188,12 @@ public class RowWriter {
                 if (inputValue instanceof Date) {
                     statement.setTimestamp(statementIndex, new Timestamp(((Date) inputValue).getTime()));
                     if (debug) {
-                        debugUtil.writeColumn(formatter.format((Date) inputValue), false);
+                        if (pattern.length() == 0 || pattern == null) {
+                            debugUtil.writeColumn(inputValue.toString(), false);
+                        } else {
+                            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                            debugUtil.writeColumn(sdf.format((Date) inputValue), false);
+                        }
                     }
                 } else {
                     statement.setTimestamp(statementIndex, new Timestamp((long) inputValue));
