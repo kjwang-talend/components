@@ -103,9 +103,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     public void setupProperties() {
         super.setupProperties();
         loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
-        String ss = String.valueOf(account.getStoredValue()) + String.valueOf(customRegionID.getStoredValue());
-        account.setStoredValue(ss);
-
     }
 
     @Override
