@@ -344,7 +344,7 @@ public class SnowflakeConnectionPropertiesTest {
 
     @Test
     public void testAlternativeSchema() {
-        snowflakeConnectionProperties.setWithAlternativeSchema(true);
+        snowflakeConnectionProperties.setShowAlternativeSchemaProperty(true);
         snowflakeConnectionProperties.userPassword.setupLayout();
         snowflakeConnectionProperties.setupLayout();
 
@@ -364,7 +364,7 @@ public class SnowflakeConnectionPropertiesTest {
 
     @Test
     public void testHiddenAlternateSchema() {
-        snowflakeConnectionProperties.setWithAlternativeSchema(true);
+        snowflakeConnectionProperties.setShowAlternativeSchemaProperty(true);
         snowflakeConnectionProperties.userPassword.setupLayout();
         snowflakeConnectionProperties.setupLayout();
         snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));

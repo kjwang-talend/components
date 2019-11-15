@@ -167,7 +167,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         String refComponentId = connProps.getReferencedComponentId();
         // Using another component's connection
         if (refComponentId != null) {
-            if(connProps.isWithAlternativeSchema() && connProps.useAlternativeSchema.getValue()) {
+            if(connProps.isShowAlternativeSchemaProperty() && connProps.useAlternativeSchema.getValue()) {
                 return connProps.alternativeSchemaName.getValue();
             }
             // In a runtime container

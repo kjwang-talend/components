@@ -209,7 +209,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                     connectionProperties1 = sprops.getConnectionProperties();
                 }
 
-                if(connectionProperties.isWithAlternativeSchema() && connectionProperties.getReferencedConnectionProperties() != null && connectionProperties.useAlternativeSchema.getValue()) {
+                if(connectionProperties.isShowAlternativeSchemaProperty() && connectionProperties.getReferencedConnectionProperties() != null && connectionProperties.useAlternativeSchema.getValue()) {
                     schemaName = connectionProperties.alternativeSchemaName.getValue();
                 } else {
                     schemaName = connectionProperties1.schemaName.getValue();
@@ -425,7 +425,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         SnowflakeConnectionProperties connectionProperties = outputProperties.getConnectionProperties();
         String schemaName = connectionProperties.schemaName.getValue();
         if(connectionProperties.getReferencedComponentId() != null) {
-            if(connectionProperties.isWithAlternativeSchema() && connectionProperties.useAlternativeSchema.getValue()) {
+            if(connectionProperties.isShowAlternativeSchemaProperty() && connectionProperties.useAlternativeSchema.getValue()) {
                 schemaName = connectionProperties.alternativeSchemaName.getValue();
             } else {
                 schemaName = connectionProperties.getReferencedConnectionProperties().schemaName.getValue();

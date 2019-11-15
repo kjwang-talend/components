@@ -83,7 +83,7 @@ public class SnowflakeSourceOrSinkTest {
         properties.referencedComponent.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
         properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
         properties.referencedComponent.setReference(refProperties);
-        properties.setWithAlternativeSchema(true);
+        properties.setShowAlternativeSchemaProperty(true);
         properties.useAlternativeSchema.setValue(true);
         properties.alternativeSchemaName.setValue("NEW_SCHEMA");
 

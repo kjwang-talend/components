@@ -105,6 +105,7 @@ public class SnowflakeCommitAndRollbackTestIT extends SnowflakeTestIT {
         RUNTIME_CONTAINER
                 .setComponentData(componentInstanceId, SnowflakeRuntime.KEY_CONNECTION,
                         conn = DriverManagerUtils.getConnection(properties));
+        conn.setSchema(properties.schemaName.getValue());
         conn.setAutoCommit(properties.autoCommit.getValue());
         try (Statement st = conn.createStatement()) {
             st.executeQuery("alter user " + USER + " set mins_to_unlock=0");

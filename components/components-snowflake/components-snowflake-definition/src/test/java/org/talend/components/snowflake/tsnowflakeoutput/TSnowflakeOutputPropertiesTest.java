@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.tableaction.TableAction;
-import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -236,7 +235,7 @@ public class TSnowflakeOutputPropertiesTest {
 
     @Test
     public void testWithAlternativeSchema() {
-        Assert.assertTrue(outputProperties.getConnectionProperties().isWithAlternativeSchema());
+        Assert.assertTrue(outputProperties.getConnectionProperties().isShowAlternativeSchemaProperty());
     }
 
 }

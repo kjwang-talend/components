@@ -99,7 +99,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<String> alternativeSchemaName = newString("alternativeSchemaName").setRequired(); //$NON-NLS-1$
 
-    private boolean withAlternativeSchema;
+    private boolean showAlternativeSchemaProperty;
 
     public SnowflakeConnectionProperties(String name) {
         super(name);
@@ -139,7 +139,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(autoCommit);
         advancedForm.addRow(jdbcParameters);
-        if(withAlternativeSchema) {
+        if(showAlternativeSchemaProperty) {
             advancedForm.addRow(useAlternativeSchema);
             advancedForm.addRow(alternativeSchemaName);
             setAlternateSchemaHidden(true, advancedForm);
@@ -158,7 +158,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     }
 
     private void setAlternateSchemaHidden(boolean hidden, Form form) {
-        if(withAlternativeSchema) {
+        if(showAlternativeSchemaProperty) {
             form.getWidget(useAlternativeSchema.getName())
                 .setHidden(hidden);
             form.getWidget(alternativeSchemaName.getName())
@@ -248,7 +248,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
                 .getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
             return this;
         }
-        if(isWithAlternativeSchema() && useAlternativeSchema.getValue()) {
+        if(isShowAlternativeSchemaProperty() && useAlternativeSchema.getValue()) {
             return this;
         }
         return referencedComponent.getReference();
@@ -394,12 +394,12 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         return 1;
     }
 
-    public void setWithAlternativeSchema(boolean withAlternativeSchema) {
-        this.withAlternativeSchema = withAlternativeSchema;
+    public void setShowAlternativeSchemaProperty(boolean showAlternativeSchemaProperty) {
+        this.showAlternativeSchemaProperty = showAlternativeSchemaProperty;
     }
 
-    public boolean isWithAlternativeSchema() {
-        return this.withAlternativeSchema;
+    public boolean isShowAlternativeSchemaProperty() {
+        return this.showAlternativeSchemaProperty;
     }
 
 }
