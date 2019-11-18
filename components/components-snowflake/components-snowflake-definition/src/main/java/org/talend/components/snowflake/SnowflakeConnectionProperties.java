@@ -72,7 +72,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     public Property<Boolean> useCustomRegion = newBoolean("useCustomRegion");
 
     @Deprecated //only keep for backward compatibility
-    public Property<String> customRegionID = newString("customRegionID").setRequired();
+    public Property<String> customRegionID = newString("customRegionID");
 
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
 
